@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include "cache.h"
 int main(int argc, char* argv[]){
 	if(argc < 2){
 		printf("Error: No input file.\n");
@@ -41,17 +41,16 @@ int main(int argc, char* argv[]){
 	for (i = 0; i < numIndicies; i++) {
 		tag[i] = 0;
 	}
-
+	CacheSet* oneCacheSet = initCacheSet(2048, 1);
 	while (fscanf(inputFile, "%d", &curAddr) != EOF) {
 		fscanf(inputFile, " %x", &curAddr);
-		numAddr++;
-		curIndex = curAddr >> offset & indexMask;
-		curTag= curAddr >> offset + numIndexBits & tagMask;
-		
-		if (curTag == tag[curIndex])
+		if(isInCacheSet(oneCacheSet, curAddr)){
 			numHits++;
-		else 
-			tag[curIndex] = curTag;		
+		}
+		else{
+			insertIntoCacheSet(oneCacheSet, curAddr);
+		}
+		numAddr++;
 	}
 
 	printf("Cache #1\n");
