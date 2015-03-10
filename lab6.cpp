@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 int main(int argc, char** argv){
 	
 	return 0;
@@ -15,9 +16,6 @@ each cache set is made of:
 tag, data
 tag, data size depend on initial conditions.
 */
-int log2(int val){
-	return 0;
-}
 class Line{
 private:
 	char* data;
@@ -25,12 +23,12 @@ private:
 	int tagBits;
 public:
 	Line(int tagBits, int byteOffsetBits);
-	~Line(){free(data);}
+	~Line(){delete[] data;}
 };
 Line::Line(int tagBits, int byteOffsetBits){
 	this->tagBits = tagBits;
 	int dataBytes = 1 << (byteOffsetBits-1);
-	data =(char*)  malloc(sizeof(char) * dataBytes);
+	data = new char[dataBytes];
 }
  
 	
@@ -38,7 +36,7 @@ Line::Line(int tagBits, int byteOffsetBits){
 
 class CacheSet{
 private:
-	Line lines[];
+	Line* lines;
 public:
 	CacheSet(int size, int lineSize);
 	~CacheSet(){delete[] lines;}
@@ -51,5 +49,5 @@ CacheSet::CacheSet(int size, int lineSize){
 	int indexBits = log2(indexSize);
 	int tagBits = 32 - byteOffsetBits - indexBits;
 
-	lines = new Line[indexSize];
+	lines = new Line(tagBits, byteOffsetBits)[indexSize];
 }
