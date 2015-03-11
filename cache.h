@@ -1,45 +1,38 @@
-//this should be copied into our main program file.
+#ifndef CACHE_H
+#define CACHE_H
 typedef struct{
-unsigned int* tags;
-int tagBits;
-int byteOffsetBits;
-unsigned int indexSize;
-unsigned int indexMask;
-}CacheSet;
+	CacheSet* cacheSets;
+	int numCacheSets;
+}Cache;
 
-CacheSet* initCacheSet(int cacheSize, int lineSize){
- CacheSet* thisCacheSet = malloc(sizeof(CacheSet));
- int indexSize = cacheSize/lineSize;
- int byteOffsetBits = log2(lineSize);
-	int indexBits = log2(indexSize);
- int tagBits = 32 - byteOffsetBits - indexBits;
- thisCacheSet->tags = calloc(sizeof(int), indexSize);
- 	thisCacheSet->indexSize = indexSize;
-	thisCacheSet->tagBits = tagBits;
-	thisCacheSet->byteOffsetBits = byteOffsetBits;
-	thisCacheSet->indexMask = (1 << indexBits) - 1; 
-	return thisCacheSet;
-}
-
-//does not check to see if address is already in cach
-void insertIntoCacheSet(CacheSet* thisCacheSet, int address){
-	//get address to insert to
-	int index = address >> thisCacheSet->byteOffsetBits;
-	index &= thisCacheSet->indexMask;
-	//do tag
-	int tag = address >> (32 - thisCacheSet->tagBits);
-	//insert
-	thisCacheSet->tags[index] = tag;
+//CacheSize  and line size are in bytes!
+void initCache(int associativity, int cacheSize, int lineSize){
+	Cache* thisCache = malloc(sizeof(Cache));
+	thisCache->cacheSets = malloc(sizeof(CacheSet) * associativity);
+	for(int i = 0; i < associativity, i++){
+		initCacheSet(cacheSets[i], cacheSize/associativity, lineSize);
+	}
+	thisCache->numCacheSets = associativity;
 	return;
 }
 
-int isInCacheSet(CacheSet* thisCacheSet, int address){
-	int tag = address >> (32 - thisCacheSet->tagBits);
-	int index = address >> thisCacheSet->byteOffsetBits;
-	index &= thisCacheSet->indexMask;	
-	if(thisCacheSet->tags[index] == tag){
-		return 1;
+//search through the cachesets to see if the address is in any of them
+int isInCache(Cache* thisCache, int address){
+	for(int i = 0; i < thisCache->numCacheSets; i++){
+		if(isInCacheSet(thisCache->cacheSets[i], address)){
+			//add in recently used update here?
+			return 1;
+		}
 	}
 	return 0;
 }
 
+//note: does not check to see if address is already in cache
+void insertIntoCache(Cache* thisCache, int address){
+	int index = indexFromCacheSet(thisCache->cacheSets[0], address);
+	insertIntoCacheSet(thisCache->cacheSets[leastRecentlyUsed(thisCache, index)], address);
+	return;
+}
+
+
+#endif	
