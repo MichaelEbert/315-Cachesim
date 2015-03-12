@@ -9,6 +9,13 @@ unsigned int indexSize;
 unsigned int indexMask;
 }CacheSet;
 
+int getIndex(CacheSet* thisCacheSet, int address){
+	int index = address >> thisCacheSet->byteOffsetBits;
+	index &= thisCacheSet->indexMask;
+	return index;
+}
+
+//cacheSize and lineSize are in bytes!!!
 CacheSet* initCacheSet(int cacheSize, int lineSize){
  CacheSet* thisCacheSet = malloc(sizeof(CacheSet));
  int indexSize = cacheSize/lineSize;
@@ -26,8 +33,7 @@ CacheSet* initCacheSet(int cacheSize, int lineSize){
 //does not check to see if address is already in cach
 void insertIntoCacheSet(CacheSet* thisCacheSet, int address){
 	//get address to insert to
-	int index = address >> thisCacheSet->byteOffsetBits;
-	index &= thisCacheSet->indexMask;
+	int index = getIndex(thisCacheSet, address);
 	//do tag
 	int tag = address >> (32 - thisCacheSet->tagBits);
 	//insert
@@ -37,8 +43,7 @@ void insertIntoCacheSet(CacheSet* thisCacheSet, int address){
 
 int isInCacheSet(CacheSet* thisCacheSet, int address){
 	int tag = address >> (32 - thisCacheSet->tagBits);
-	int index = address >> thisCacheSet->byteOffsetBits;
-	index &= thisCacheSet->indexMask;	
+	int index = getIndex(thisCacheSet, address);
 	if(thisCacheSet->tags[index] == tag){
 		return 1;
 	}

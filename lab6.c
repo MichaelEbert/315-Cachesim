@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "cacheset.h"
+#include "cache.h"
 int main(int argc, char* argv[]){
 	if(argc < 2){
 		printf("Error: No input file.\n");
@@ -19,42 +20,26 @@ int main(int argc, char* argv[]){
 	int numHits = 0;
 	int numAddr = 0;
 	int numWords = 1;
-	int cacheSize = 2;
+	int cacheSize = 2048;
+	int associativity = 2;
+	int blockSize = 1;
 
-	// Processing an address
-	int curAddr = 0;
-	int curTag = 0;
-	int curIndex = 0;
-	
-	// Calculating bits
-	int numIndexBits = log2(cacheSize/2) + 10 - numWords;
-	int offset = log2(numWords) + 2;
-	int numTagBits = 32 - numIndexBits - offset;
-	int numIndicies = 1 << numIndexBits;
+	int curAddr;
 
-	// Masks
-	int indexMask = (1 << numIndexBits) - 1;
-	int tagMask = (1 << numTagBits) - 1;
-
-	int tag[numIndicies];
-
-	for (i = 0; i < numIndicies; i++) {
-		tag[i] = 0;
-	}
-	CacheSet* oneCacheSet = initCacheSet(2048, 1);
+	Cache* thisCache = initCache(associativity, cacheSize, blockSize*2*2);
 	while (fscanf(inputFile, "%d", &curAddr) != EOF) {
 		fscanf(inputFile, " %x", &curAddr);
-		if(isInCacheSet(oneCacheSet, curAddr)){
+		if(isInCache(thisCache, curAddr)){
 			numHits++;
 		}
 		else{
-			insertIntoCacheSet(oneCacheSet, curAddr);
+			insertIntoCache(thisCache, curAddr);
 		}
 		numAddr++;
 	}
 
 	printf("Cache #1\n");
-	printf("Number of addresses: %d\n", numAddr);
-	printf("Hit rate = %0.2lf%\n", 100 * (double)numHits/numAddr);
+	printf("Cache size: %dB\tAssociativity: %d\tBlock size: %d\n",cacheSize, associativity, blockSize);
+	printf("Hits: %d\tHit rate = %0.2lf%\n", numHits, 100 * (double)numHits/numAddr);
 
 }
