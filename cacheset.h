@@ -45,8 +45,8 @@ void insertIntoCacheSet(CacheSet* thisCacheSet, int address){
 }
 
 int isInCacheSet(CacheSet* thisCacheSet, int address){
+    int index = getIndex(thisCacheSet, address);
 	int tag = address >> (32 - thisCacheSet->tagBits);
-	int index = getIndex(thisCacheSet, address);
 	if(thisCacheSet->tags[index] == tag){
 		return 1;
 	}

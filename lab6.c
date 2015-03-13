@@ -34,7 +34,7 @@ int main(int argc, char* argv[]){
     		}
     		numAddr++;
     	}
-    	printf("Cache #%d\n",i);
+    	printf("Cache #%d\n",i+1);
     	printf("Cache size: %dB\tAssociativity: %d\tBlock size: %d\n",cacheSize, associativity, blockSize);
     	printf("Hits: %d\tHit rate = %0.2lf%%\n", numHits, 100 * (double)numHits/numAddr);
     	printf("---------------------------\n");
