@@ -1,5 +1,11 @@
 #ifndef CACHE_H
 #define CACHE_H
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "cacheset.h"
+
 typedef struct{
 	CacheSet* cacheSets;
 	int numCacheSets;
@@ -9,7 +15,7 @@ typedef struct{
 int leastRecentlyUsed(Cache* thisCache, int index){
 	int lru = thisCache->lruTable[index][0];
 	for(int i = 1; i < thisCache->numCacheSets; i++){
-		thisCache->lruTable[index][1] = thisCache->lruTable[index][i];
+		thisCache->lruTable[index][i-1] = thisCache->lruTable[index][i];
 	}
 	thisCache->lruTable[index][thisCache->numCacheSets-1] = lru;
 	return lru;

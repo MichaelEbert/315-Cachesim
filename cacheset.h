@@ -1,6 +1,9 @@
 #ifndef CACHESET_H
 #define CACHESET_H
 
+#include <math.h>
+#include <stdlib.h>
+
 typedef struct{
 unsigned int* tags;
 int tagBits;
